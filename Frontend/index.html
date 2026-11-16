@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harvest Rescue — Farmer Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="extra.css">
+</head>
+<body>
+<div class="announcement"><span>🌱</span> Every rescued harvest makes a difference. <a href="#how-it-works">Learn how it works →</a></div>
+<header class="topbar">
+  <a class="brand" href="#"><span class="brand-icon">✳</span><span>harvest<span class="brand-light">rescue</span><small>FRESH FOOD. FAIRER FUTURE.</small></span></a>
+  <nav class="desktop-nav"><a href="#marketplace">Marketplace</a><a href="#orders">My orders</a><a href="#my-listings" id="navMine" hidden>My listings</a><a href="#how-it-works">How it works</a></nav>
+  <div class="header-actions">
+    <select id="who" aria-label="Signed in as"></select>
+    <button class="btn btn-green" id="sellButton" hidden>＋ Sell produce</button>
+  </div>
+</header>
+<main>
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow"><span class="pulse"></span> LOCAL FARMERS · FRESH HARVESTS</div>
+    <h1>Good food deserves<br>to find <em>a table.</em></h1>
+    <p>Buy fresh, local produce directly from farmers. Help rescue surplus harvests, support farming communities, and waste less food.</p>
+    <div class="hero-actions"><a class="btn btn-green btn-large" href="#marketplace">Explore produce <span>↗</span></a></div>
+  </div>
+  <div class="hero-art">
+    <div class="hero-image"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=85" alt="Fresh colourful produce at a market"></div>
+    <div class="floating-card floating-top"><span class="float-icon">↗</span><div><strong>Less waste, more value</strong><small>Surplus finds a buyer</small></div></div>
+    <div class="decor decor-one"></div><div class="decor decor-two"></div>
+  </div>
+</section>
+
+<section class="market section-wrap" id="marketplace">
+  <div class="section-heading"><div><div class="eyebrow">THE FRESH MARKET</div><h2>Good things, <em>grown nearby.</em></h2><p>Discover seasonal produce from farmers around Sri Lanka.</p></div></div>
+  <div class="market-controls">
+    <label class="searchbox"><span>⌕</span><input id="searchInput" type="search" placeholder="Search produce, farms or locations…"></label>
+    <select id="locationFilter" aria-label="Filter by location"><option value="">All locations</option></select>
+    <select id="sortFilter" aria-label="Sort produce"><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="urgent">Urgent first</option></select>
+  </div>
+  <div class="category-row" id="categoryRow">
+    <button class="category active" data-category="All">All produce</button><button class="category" data-category="Vegetables">🥬 Vegetables</button><button class="category" data-category="Fruits">🍌 Fruits</button><button class="category" data-category="Leafy greens">🌿 Leafy greens</button><button class="category" data-category="Surplus">⚡ Surplus deals</button>
+  </div>
+  <div class="results-line"><span id="resultsCount"></span><span>Prices shown in LKR per kg</span></div>
+  <div class="product-grid" id="productGrid"></div>
+  <div class="empty-state" id="emptyState" hidden><span>🌾</span><h3>No produce found</h3><p>Try another search or change your filters.</p></div>
+</section>
+
+<section class="panel" id="orders"><h2>My orders</h2><p id="ordersHint"></p><div id="orderList"></div></section>
+<section class="panel" id="my-listings" hidden><h2>My listings</h2><p>Produce you have put on the market.</p><div id="mineList"></div></section>
+
+<section class="how section-wrap" id="how-it-works"><div class="section-heading centered"><div><div class="eyebrow">SIMPLE BY DESIGN</div><h2>From farm to <em>front door.</em></h2><p>A few simple steps can help good food find the people who need it.</p></div></div>
+<div class="steps"><article><div class="step-icon">🌱</div><h3>Farmers list produce</h3><p>Share the crop, quantity, price, location, and when it needs to be sold.</p></article><article><div class="step-icon">🔎</div><h3>Buyers discover it</h3><p>Shops, restaurants, and households browse produce that fits their needs.</p></article><article><div class="step-icon">🚚</div><h3>Good food gets moving</h3><p>The farmer accepts the order, then you agree collection or delivery directly.</p></article></div></section>
+</main>
+<footer><a class="brand footer-brand" href="#"><span class="brand-icon">✳</span><span>harvest<span class="brand-light">rescue</span></span></a><p>Helping good food find a table.</p><small class="copyright">© 2026 Harvest Rescue · Prototype with sample data</small></footer>
+
+<div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" role="dialog" aria-modal="true"><button class="modal-close" id="modalClose" aria-label="Close dialog">×</button><div id="modalContent"></div></section></div>
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>

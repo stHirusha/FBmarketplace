@@ -1,0 +1,16 @@
+[hidden]{display:none!important}
+.header-actions select{border:1px solid #dce3d8;border-radius:8px;padding:10px;background:#fff;color:var(--green);font-weight:700;font-size:13px;max-width:210px}
+.hero{padding-top:48px;padding-bottom:44px}
+.panel{padding:56px max(7vw,24px);border-top:1px solid #edf0e9}
+.panel h2{font-family:Manrope,sans-serif;font-size:30px;letter-spacing:-1.2px;margin:0 0 6px}
+.panel>p{color:#7a8379;margin:0 0 22px;font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;border:1px solid #e9ece5;border-radius:12px;padding:16px 18px;margin-bottom:10px;background:#fff}
+.row b{font-family:Manrope,sans-serif}.row small{display:block;color:#7c8879;margin-top:4px;font-size:12px}
+.row .acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn.small{padding:8px 12px;font-size:12px}.btn-danger{background:#fff;border-color:#e8cdc8;color:#a54e43}
+.status{font-size:10px;font-weight:800;border-radius:5px;padding:4px 8px;background:#f0f4e8;color:#355c3a}
+.status.pending{background:#fff0d7;color:#9a5c12}
+.status.cancelled,.status.rejected,.status.declined,.status.closed{background:#fbe7e3;color:#a54e43}
+.product-card{cursor:pointer}
+.empty{color:#73816e;padding:20px 0}
+@media(max-width:700px){.topbar{height:auto;flex-wrap:wrap;padding:10px 18px;gap:10px}.desktop-nav{display:flex;order:3;width:100%;gap:18px;overflow:auto;white-space:nowrap}.header-actions #sellButton:not([hidden]){display:inline-flex}.panel{padding:40px 20px}}
