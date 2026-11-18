@@ -259,4 +259,4 @@ def init():
         c.execute("UPDATE listings SET available_until=? WHERE id IN (2,3)", (soon,))
 
 
-app.mount("/", StaticFiles(directory=ROOT / "frontend", html=True), name="frontend")
+app.mount("/", StaticFiles(directory=ROOT / "Frontend", html=True), name="frontend")
