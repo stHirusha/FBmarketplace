@@ -29,6 +29,15 @@ CREATE TABLE IF NOT EXISTS orders(
 -- Append-only log of everything that happens. Agents will read from this.
 CREATE TABLE IF NOT EXISTS events(
   id INTEGER PRIMARY KEY, ts REAL, type TEXT, entity TEXT, entity_id INTEGER, payload TEXT);
+CREATE TABLE IF NOT EXISTS buyer_requirements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    buyer_id INTEGER NOT NULL,
+    produce TEXT NOT NULL,
+    quantity_kg REAL NOT NULL,
+    max_price_per_kg REAL NOT NULL,
+    district TEXT,
+    FOREIGN KEY (buyer_id) REFERENCES users(id)
+);
 """
 
 
@@ -236,27 +245,71 @@ def events(type: str = "", limit: int = 100):
 
 
 # ---------- startup + sample data (fictional) ----------
+
 @app.on_event("startup")
 def init():
     with conn() as c:
         c.executescript(SCHEMA)
-        if c.execute("SELECT COUNT(*) FROM users").fetchone()[0]:
-            return
-        for n, r, ph, d in [
-            ("Nimal Perera (farmer)", "farmer", "0710000001", "Nuwara Eliya"),
-            ("Kamala Silva (farmer)", "farmer", "0710000002", "Badulla"),
-            ("Green Mart (buyer)", "buyer", "0770000001", "Colombo"),
-            ("Fresh Juice Co. (buyer)", "buyer", "0770000002", "Kandy"),
-            ("Lanka Wholesale (buyer)", "buyer", "0770000003", "Colombo")]:
-            c.execute("INSERT INTO users(name,role,phone,district) VALUES(?,?,?,?)", (n, r, ph, d))
-        for f, p, q, pr, d in [(1, "Tomato", 200, 170, "Nuwara Eliya"),
-                               (1, "Carrot", 120, 210, "Nuwara Eliya"),
-                               (2, "Tomato", 80, 160, "Badulla"),
-                               (2, "Spinach", 40, 120, "Badulla")]:
-            c.execute("INSERT INTO listings(farmer_id,produce,quantity_kg,price_per_kg,district,"
-                      "created_at) VALUES(?,?,?,?,?,?)", (f, p, q, pr, d, time.time()))
-        soon = time.strftime("%Y-%m-%dT%H:%M", time.localtime(time.time() + 30 * 3600))
-        c.execute("UPDATE listings SET available_until=? WHERE id IN (2,3)", (soon,))
 
+        # Insert sample users and listings only for a new database
+        if c.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 0:
+
+            for n, r, ph, d in [
+                ("Nimal Perera (farmer)", "farmer", "0710000001", "Nuwara Eliya"),
+                ("Kamala Silva (farmer)", "farmer", "0710000002", "Badulla"),
+                ("Green Mart (buyer)", "buyer", "0770000001", "Colombo"),
+                ("Fresh Juice Co. (buyer)", "buyer", "0770000002", "Kandy"),
+                ("Lanka Wholesale (buyer)", "buyer", "0770000003", "Colombo")
+            ]:
+                c.execute(
+                    "INSERT INTO users(name,role,phone,district) VALUES(?,?,?,?)",
+                    (n, r, ph, d)
+                )
+
+            for f, p, q, pr, d in [
+                (1, "Tomato", 200, 170, "Nuwara Eliya"),
+                (1, "Carrot", 120, 210, "Nuwara Eliya"),
+                (2, "Tomato", 80, 160, "Badulla"),
+                (2, "Spinach", 40, 120, "Badulla")
+            ]:
+                c.execute(
+                    "INSERT INTO listings(farmer_id,produce,quantity_kg,price_per_kg,district,created_at) VALUES(?,?,?,?,?,?)",
+                    (f, p, q, pr, d, time.time())
+                )
+
+            soon = time.strftime(
+                "%Y-%m-%dT%H:%M",
+                time.localtime(time.time() + 30 * 3600)
+            )
+            c.execute(
+                "UPDATE listings SET available_until=? WHERE id IN (2,3)",
+                (soon,)
+            )
+
+    # Always initialize buyer requirements
+    init_buyer_requirements()
+
+
+def init_buyer_requirements():
+    with conn() as c:
+        count = c.execute(
+            "SELECT COUNT(*) FROM buyer_requirements"
+        ).fetchone()[0]
+
+        if count > 0:
+            return
+
+        requirements = [
+            (3, "Tomato", 150, 180, "Colombo"),
+            (3, "Carrot", 100, 220, "Colombo"),
+            (4, "Carrot", 100, 230, "Kandy"),
+            (5, "Tomato", 200, 175, "Colombo"),
+        ]
+
+        c.executemany("""
+            INSERT INTO buyer_requirements
+            (buyer_id, produce, quantity_kg, max_price_per_kg, district)
+            VALUES (?, ?, ?, ?, ?)
+        """, requirements)
 
 app.mount("/", StaticFiles(directory=ROOT / "Frontend", html=True), name="frontend")
