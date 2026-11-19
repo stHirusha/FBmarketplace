@@ -67,9 +67,25 @@ def find_matching_buyers(produce, quantity, price, district):
         print(f"District: {allocation['district']}")
         print("-" * 40)
 
-    print(f"Total quantity rescued: {quantity - remaining_quantity} kg")
-    print(f"Remaining quantity: {remaining_quantity} kg")
+        total_rescued = quantity - remaining_quantity
+        potential_recovery = total_rescued * price
 
-    return allocations
+        print("\nRescue Summary")
+        print("=" * 40)
 
-find_matching_buyers("Carrot", 200, 200, "Colombo")
+        print(f"Available quantity: {quantity} kg")
+        print(f"Successfully matched: {total_rescued} kg")
+        print(f"Unsold quantity: {remaining_quantity} kg")
+        print(f"Farmer's price: Rs. {price}/kg")
+        print(f"Potential recovery: Rs. {potential_recovery:,.2f}")
+
+        if remaining_quantity == 0:
+            print("Rescue status: FULLY RESCUED")
+        elif total_rescued > 0:
+            print("Rescue status: PARTIALLY RESCUED")
+        else:
+            print("Rescue status: FAILED")
+
+        return allocations
+
+find_matching_buyers("Tomato", 200, 170, "Nuwara Eliya")
