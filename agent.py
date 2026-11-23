@@ -1,5 +1,46 @@
 import sqlite3
 
+def calculate_match_score(farmer_district, buyer_district, farmer_price, buyer_max_price, buyer_quantity, required_quantity):
+
+    score = 0
+
+    # 1. District match
+    if farmer_district.lower() == buyer_district.lower():
+        score += 40
+
+    # 2. Price suitability
+    if buyer_max_price >= farmer_price:
+        score += 30
+
+    # 3. Quantity suitability
+    if buyer_quantity >= required_quantity:
+        score += 20
+
+    # 4. Produce match
+    score += 10
+
+    return score
+
+def explain_buyer_match(produce, farmer_price, farmer_district, buyer_quantity, buyer_max_price, buyer_district, allocated_quantity):
+
+    reasons = []
+
+    reasons.append(f"Requires {produce}")
+
+    if buyer_max_price >= farmer_price:
+        reasons.append(f"Accepts the farmer's price of Rs. {farmer_price}/kg")
+
+    if farmer_district.lower() == buyer_district.lower():
+        reasons.append("Located in the farmer's district")
+    else:
+        reasons.append(f"Located in {buyer_district}")
+
+    reasons.append(f"Can purchase {allocated_quantity} kg")
+
+    explanation = ", ".join(reasons)
+
+    return explanation
+
 def find_matching_buyers(produce, quantity, price, district):
 
     print("Searching for matching buyers...")
@@ -46,13 +87,34 @@ def find_matching_buyers(produce, quantity, price, district):
 
         buyer_id, name, buyer_produce, buyer_quantity, max_price, buyer_district = buyer
 
+        score = calculate_match_score(
+            district,
+            buyer_district,
+            price,
+            max_price,
+            buyer_quantity,
+            quantity
+        )
+
         allocated_quantity = min(remaining_quantity, buyer_quantity)
+
+        explanation = explain_buyer_match(
+            produce,
+            price,
+            district,
+            buyer_quantity,
+            max_price,
+            buyer_district,
+            allocated_quantity
+        )
 
         allocations.append({
             "buyer": name,
             "quantity": allocated_quantity,
             "max_price": max_price,
-            "district": buyer_district
+            "district": buyer_district,
+            "match_score": score,
+            "explanation": explanation
         })
 
         remaining_quantity -= allocated_quantity
@@ -65,27 +127,34 @@ def find_matching_buyers(produce, quantity, price, district):
         print(f"Quantity: {allocation['quantity']} kg")
         print(f"Maximum price: Rs. {allocation['max_price']}/kg")
         print(f"District: {allocation['district']}")
+        print(f"Matching score: {allocation['match_score']}/100")
+        print(f"Reason: {allocation['explanation']}")
         print("-" * 40)
 
-        total_rescued = quantity - remaining_quantity
-        potential_recovery = total_rescued * price
+    total_rescued = sum(
+        allocation["quantity"] for allocation in allocations
+    )
 
-        print("\nRescue Summary")
-        print("=" * 40)
+    remaining_quantity = quantity - total_rescued
 
-        print(f"Available quantity: {quantity} kg")
-        print(f"Successfully matched: {total_rescued} kg")
-        print(f"Unsold quantity: {remaining_quantity} kg")
-        print(f"Farmer's price: Rs. {price}/kg")
-        print(f"Potential recovery: Rs. {potential_recovery:,.2f}")
+    potential_recovery = total_rescued * price
 
-        if remaining_quantity == 0:
-            print("Rescue status: FULLY RESCUED")
-        elif total_rescued > 0:
-            print("Rescue status: PARTIALLY RESCUED")
-        else:
-            print("Rescue status: FAILED")
+    print("\nRescue Summary")
+    print("=" * 40)
 
-        return allocations
+    print(f"Available quantity: {quantity} kg")
+    print(f"Successfully matched: {total_rescued} kg")
+    print(f"Unsold quantity: {remaining_quantity} kg")
+    print(f"Farmer's price: Rs. {price}/kg")
+    print(f"Potential recovery: Rs. {potential_recovery:,.2f}")
 
-find_matching_buyers("Tomato", 200, 170, "Nuwara Eliya")
+    if remaining_quantity == 0:
+        print("Rescue status: FULLY RESCUED")
+    elif total_rescued > 0:
+        print("Rescue status: PARTIALLY RESCUED")
+    else:
+        print("Rescue status: FAILED")
+
+    return allocations
+
+find_matching_buyers("Carrot", 200, 200, "Colombo")
