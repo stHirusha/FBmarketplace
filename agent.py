@@ -114,6 +114,18 @@ def find_matching_buyers(produce, quantity, price, district):
     buyers = cursor.fetchall()
     conn.close()
 
+    buyers.sort(
+    key=lambda buyer: calculate_match_score(
+        district,
+        buyer[5],
+        price,
+        buyer[4],
+        buyer[3],
+        quantity
+    ),
+    reverse=True
+)
+
     remaining_quantity = quantity
     allocations = []
 
