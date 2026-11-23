@@ -41,9 +41,46 @@ def explain_buyer_match(produce, farmer_price, farmer_district, buyer_quantity, 
 
     return explanation
 
+def calculate_urgency(produce):
+
+    produce = produce.lower()
+
+    urgency_levels = {
+        "spinach": 5,
+        "lettuce": 5,
+        "cabbage": 4,
+        "tomato": 4,
+        "carrot": 3,
+        "potato": 2,
+        "onion": 1
+    }
+
+    urgency = urgency_levels.get(produce, 3)
+
+    return urgency
+
+def calculate_rescue_priority(match_score, urgency):
+
+    priority_score = match_score + (urgency * 5)
+
+    return min(priority_score, 100) 
+
 def find_matching_buyers(produce, quantity, price, district):
 
     print("Searching for matching buyers...")
+
+    urgency = calculate_urgency(produce)
+
+    if urgency >= 5:
+        urgency_label = "CRITICAL"
+    elif urgency >= 4:
+        urgency_label = "HIGH"
+    elif urgency >= 3:
+        urgency_label = "MEDIUM"
+    elif urgency >= 2:
+        urgency_label = "LOW"
+    else:
+        urgency_label = "VERY LOW"
 
     conn = sqlite3.connect("market.db")
     cursor = conn.cursor()
@@ -96,6 +133,8 @@ def find_matching_buyers(produce, quantity, price, district):
             quantity
         )
 
+        priority_score = calculate_rescue_priority(score, urgency)
+
         allocated_quantity = min(remaining_quantity, buyer_quantity)
 
         explanation = explain_buyer_match(
@@ -114,12 +153,16 @@ def find_matching_buyers(produce, quantity, price, district):
             "max_price": max_price,
             "district": buyer_district,
             "match_score": score,
+            "priority_score": priority_score,
             "explanation": explanation
         })
 
         remaining_quantity -= allocated_quantity
 
     print("\nRescue Plan")
+    print("-" * 40)
+    print(f"Produce: {produce}")
+    print(f"Urgency: {urgency_label} ({urgency}/5)")
     print("-" * 40)
 
     for allocation in allocations:
@@ -128,6 +171,7 @@ def find_matching_buyers(produce, quantity, price, district):
         print(f"Maximum price: Rs. {allocation['max_price']}/kg")
         print(f"District: {allocation['district']}")
         print(f"Matching score: {allocation['match_score']}/100")
+        print(f"Rescue priority: {allocation['priority_score']}/100")
         print(f"Reason: {allocation['explanation']}")
         print("-" * 40)
 
@@ -158,3 +202,8 @@ def find_matching_buyers(produce, quantity, price, district):
     return allocations
 
 find_matching_buyers("Carrot", 200, 200, "Colombo")
+
+print(calculate_rescue_priority(80, 4))
+print(calculate_rescue_priority(40, 3))
+print(calculate_rescue_priority(70, 5))
+
