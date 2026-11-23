@@ -204,12 +204,17 @@ def find_matching_buyers(produce, quantity, price, district):
     print(f"Farmer's price: Rs. {price}/kg")
     print(f"Potential recovery: Rs. {potential_recovery:,.2f}")
 
-    if remaining_quantity == 0:
-        print("Rescue status: FULLY RESCUED")
-    elif total_rescued > 0:
-        print("Rescue status: PARTIALLY RESCUED")
+    if remaining_quantity > 0:
+        print("\nNext Recovery Recommendation")
+
+        if total_rescued > 0:
+            print(f"{remaining_quantity} kg still needs to be rescued.")
+            print("Recommendation: Search for additional buyers or negotiate a lower price.")
+        else:
+            print("No suitable buyers were found.")
+            print("Recommendation: Expand the search to nearby districts or reconsider the price.")
     else:
-        print("Rescue status: FAILED")
+        print("\nRecommendation: All produce has been successfully allocated.")
 
     return allocations
 
